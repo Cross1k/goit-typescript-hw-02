@@ -9,35 +9,36 @@ import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn.jsx";
 import css from "./App.module.css";
 import Loader from "../Loader/Loader.jsx";
 import ErrorMessage from "../ErrorMessage/ErrorMessage.jsx";
+import { Image, onModal } from "../types.js";
 
 const App = () => {
-  const [query, setQuery] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [photos, setPhotos] = useState([]);
-  const [totalPages, setTotalPages] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [photoData, setPhotoData] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [query, setQuery] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [photos, setPhotos] = useState<Image[]>([]);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [photoData, setPhotoData] = useState<onModal | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     if (!query) return;
 
-    const fetchPhotos = async () => {
+    const fetchPhotos = async (): Promise<void> => {
       try {
         setError(false);
         setLoading(true);
         const data = await fetchPhotosTopic(query, currentPage);
         setTotalPages(data.total_pages);
-        setPhotos((prevImages) => [...prevImages, ...data.results]);
+        setPhotos((prevImages: Image[]) => [...prevImages, ...data.results]);
         setTimeout(() => {
           window.scrollBy({
             top: window.innerHeight,
             behavior: "smooth",
           });
         }, 200);
-      } catch (error) {
+      } catch (error: any) {
         setPhotos([]);
         setError(true);
         setErrorMessage(error.message);
@@ -49,25 +50,25 @@ const App = () => {
     fetchPhotos();
   }, [query, currentPage]);
 
-  const handleSearch = (query) => {
+  const handleSearch = (query: string): void => {
     setPhotos([]);
     setCurrentPage(1);
     setQuery(query);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = (): void => {
     setCurrentPage(currentPage + 1);
   };
 
-  const fetchIsOpen = (data) => {
+  const fetchIsOpen = (data: onModal): void => {
     setIsOpen(true);
     setPhotoData(data);
     document.body.style.overflow = "hidden";
   };
 
-  const modalIsClosed = () => {
+  const modalIsClosed = (): void => {
     setIsOpen(false);
-    setPhotoData([]);
+    setPhotoData(null);
     document.body.style.overflow = "";
   };
 
@@ -77,14 +78,16 @@ const App = () => {
       {error && <ErrorMessage msg={errorMessage} />}
       {photos != null && <ImageGallery item={photos} isOpen={fetchIsOpen} />}
       {loading && <Loader />}
-      {isOpen && (
+      {isOpen && photoData != null && (
         <ImageModal
           modalData={photoData}
           isOpen={isOpen}
           isClosed={modalIsClosed}
         />
       )}
-      {currentPage < totalPages && <LoadMoreBtn onClick={handleLoadMore} />}
+      {currentPage < (totalPages || 0) && (
+        <LoadMoreBtn onClick={handleLoadMore} />
+      )}
     </div>
   );
 };

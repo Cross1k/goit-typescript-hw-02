@@ -1,7 +1,14 @@
 import Modal from "react-modal";
 import css from "./ImageModal.module.css";
+import { onModal } from "../types";
 
 Modal.setAppElement("#root");
+
+interface ImageModalProps {
+  modalData: onModal;
+  isOpen: boolean;
+  isClosed: () => void;
+}
 
 const customStyles = {
   content: {
@@ -26,7 +33,7 @@ function ImageModal({
   modalData: { regular, alt_description },
   isOpen,
   isClosed,
-}) {
+}: ImageModalProps) {
   const closeModal = () => {
     isClosed();
   };

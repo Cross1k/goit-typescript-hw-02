@@ -1,11 +1,15 @@
 import css from "./SearchBar.module.css";
 
-function SearchBar({ onSearch }) {
-  const handleSubmit = (evt) => {
+type Props = {
+  onSearch: (query: string) => void;
+};
+
+function SearchBar({ onSearch }: Props) {
+  const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
-    const form = evt.target;
-    const topic = form.elements.topic.value;
-    if (form.elements.topic.value.trim() === "") {
+    const form = evt.target as HTMLFormElement;
+    const topic = (form.elements.namedItem("topic") as HTMLInputElement).value;
+    if (topic.trim() === "") {
       return alert("Please enter search term!");
     }
     onSearch(topic);

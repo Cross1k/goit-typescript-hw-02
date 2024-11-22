@@ -1,15 +1,21 @@
+import { Image, onModal } from "../types";
 import css from "./ImageCard.module.css";
+
+// type ImageCardProps = Image & onModal;
+interface ImageCardProps {
+  data: Image;
+  onModal: (onClick: onModal) => void;
+}
 
 function ImageCard({
   data: {
     alt_description,
     urls: { regular, small },
-    description,
   },
   onModal,
-}) {
-  const dataModal = () => {
-    onModal({ alt_description, regular, description });
+}: ImageCardProps) {
+  const dataModal = (): void => {
+    onModal({ alt_description, regular });
   };
   return (
     <img
